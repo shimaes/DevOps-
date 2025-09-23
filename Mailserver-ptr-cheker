@@ -1,0 +1,61 @@
+
+
+🔹 محتوای فایل get-ptr.sh
+
+#!/usr/bin/env bash
+# get-ptr.sh - دریافت میل‌سرورهای دامنه و رکورد PTR مربوط به IPها
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 domain"
+  exit 1
+fi
+
+DOMAIN="$1"
+echo "=== MX records for $DOMAIN ==="
+dig +short "$DOMAIN" MX | sort -n | while read priority host; do
+  echo "Priority: $priority - Host: $host"
+  for ip in $(dig +short "$host" A; dig +short "$host" AAAA); do
+    ptr=$(dig +short -x "$ip")
+    echo "   $ip -> PTR: ${ptr:-No PTR found}"
+  done
+done
+
+
+---
+
+🔹 محتوای فایل README.md
+
+# MX & PTR Lookup
+
+این ریپو یک اسکریپت کوتاه برای گرفتن میل‌سرورهای (MX) یک دامنه و رکورد PTR مربوط به IPهای آن‌ها است.  
+
+## استفاده
+
+### نصب ابزار
+```bash
+sudo apt update
+sudo apt install dnsutils -y
+
+اجرا
+
+chmod +x get-ptr.sh
+./get-ptr.sh example.com
+
+نمونه خروجی
+
+=== MX records for example.com ===
+Priority: 10 - Host: mx1.example.net.
+   203.0.113.45 -> PTR: mail.example.com.
+Priority: 20 - Host: mx2.example.net.
+   2001:db8::5 -> PTR: mail2.example.com.
+
+لایسنس
+
+MIT
+
+---
+
+## 🔹 ساختار پیشنهادی ریپو
+
+mx-ptr-lookup/ ├── README.md ├── get-ptr.sh └── LICE `README.md` و `get-ptr.sh` رو به صورت **پکیج آماده** بچینم که مستقیم کپی‌پیست کنی تو گیت‌هاب؟
+
