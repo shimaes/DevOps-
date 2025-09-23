@@ -1,0 +1,35 @@
+# Check MX Records (Mail Server)
+
+این ریپو یک آموزش و ابزار ساده برای پیدا کردن میل‌سرور (MX) یک سایت است.  
+خروجی شامل **نام هاست** و **آدرس IP** میل‌سرورها می‌باشد.
+
+## استفاده
+### نصب ابزار موردنیاز
+```bash
+sudo apt update
+sudo apt install dnsutils -y
+
+#اجرای اسکریپت
+chmod +x get-mx.sh
+./get-mx.sh example.com
+
+---
+
+## 🔹 محتوای فایل `get-mx.sh`
+```bash
+#!/usr/bin/env bash
+# get-mx.sh - نمایش میل‌سرورهای یک دامنه همراه IP
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 domain"
+  exit 1
+fi
+
+DOMAIN="$1"
+echo "Mail servers for $DOMAIN:"
+
+dig +short "$DOMAIN" MX | sort -n | while read priority host; do
+  ipv4=$(dig +short "$host" A | head -n1)
+  ipv6=$(dig +short "$host" AAAA | head -n1)
+  echo "$host (priority $priority) -> ${ipv4:-no IPv4}${ipv6:+, $ipv6}"
+done
