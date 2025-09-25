@@ -92,7 +92,11 @@ BACKUP_DIR="backups"
 
 # بررسی و ساخت پوشه پشتیبان‌گیری در صورت عدم وجود
 mkdir -p "$BACKUP_DIR"
+اجرای اسکریپت
+chmod +x backup_script.sh
+./backup_script.sh
 
+بررسی نتیجه: حالا با ls محتویات پوشه backups رو بررسی کن. باید یک فایل به نام app-data-backup-2025-09-24.tar.gz (با تاریخ روز) داخلش ببینی!
 # فشرده‌سازی و پشتیبان‌گیری با استفاده از دستور tar
 tar -czf "$BACKUP_DIR/$BACKUP_FILE" "$SOURCE_DIR"
 
