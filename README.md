@@ -1,2 +1,19 @@
-# DevOps-
-Learning DevOps 
+🚀🦾🛸 Pipeline Pioneers: Full CI/CD, Deployment, and Monitoring Project 🛡️
+This project implements the complete DevOps workflow for a simple Financial Microservice (Flask Microservice). The core objective is to showcase full software lifecycle automation—from coding to Continuous Deployment (CD) and real-time Monitoring—all orchestrated within the GitLab ecosystem. Key technologies utilized include Python/Flask, Docker, Ansible, Prometheus, and Telegram.
+1. Project Structure and the GitLab CI/CD Flow
+The project is hosted entirely on GitLab, and its automation flow is defined in the crucial .gitlab-ci.yml file. The pipeline consists of four sequential stages: build, test, scan, and deploy.
+In the build stage, the final Docker image of the application is constructed based on the Python code and tagged uniquely using variables like $CI_COMMIT_SHORT_SHA. This tagged image is then pushed to the GitLab Container Registry. The test stage executes the necessary tests on the newly created image. Following this, the scan stage uses Trivy to enforce a security gate, halting the pipeline if any CRITICAL or HIGH vulnerabilities are found. Finally, the deploy stage performs the automated deployment to the Production server, a best practice restricted to execution only on the main branch.
+2. Automated Deployment (CD) with Ansible
+The final deployment process is automated using Ansible via the primary Playbook located in ansible/deploy.yml. This approach ensures that the deployment is repeatable and Idempotent (can be run multiple times with the same result).
+The Playbook executes several critical tasks: first, it prepares the infrastructure (including installing Docker and managing system dependencies). Next, it copies all essential configuration files (including docker-compose.yml, prometheus.yml, and alertmanager.yml) to the deployment directory on the Production server. The final step uses the community.docker.docker_compose module to run docker-compose up, bringing up the entire multi-service stack (Flask App, Prometheus, and Alertmanager). CI/CD variables like CI_REGISTRY_IMAGE are injected into the execution environment, ensuring Ansible always pulls the latest validated image version. The Playbook also verifies service health post-deployment with a simple GET request to the /health endpoint.
+3. Advanced Monitoring and Alerting (Observability)
+A robust monitoring stack is defined to ensure service stability and timely awareness:
+Monitoring with Prometheus
+The prometheus.yml file is configured to scrape metrics from the Flask App at the /metrics endpoint every 15 seconds. These metrics track successful and unsuccessful request rates. Alert Rules are defined in alert.rules.yml; for example, the HighHttp500Rate rule triggers an alert if the rate of 500 errors exceeds a specific threshold. Custom Persian annotations are used to make alerts immediately understandable by the operations team.
+Alerting via Alertmanager and Telegram
+Alertmanager is used to manage and route the generated alerts. The alertmanager.yml.j2 file defines a receiver that routes all alerts to a designated Telegram channel via a webhook. The Telegram bot_token and chat_id are securely injected into the configuration using CI/CD variables. The final alert message sent to Telegram is customized, including the status, summary, severity, and a direct link to Prometheus for rapid investigation.
+4. Stack Composition via Docker Compose
+The docker-compose.yml file serves as the blueprint for the entire system, defining and orchestrating the three main services:
+  flask-app (The core application service)
+ prometheus (The monitoring service)     alertmanager (The alert routing and management service)
+   This file also defines the necessary volumes to mount configuration files (like prometheus.yml) into the containers, ensuring the entire system's dependencies are managed with a single command.

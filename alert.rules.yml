@@ -1,0 +1,11 @@
+groups:
+  - name: critical_alerts
+    rules:
+      - alert: HighHttp500Rate
+        expr: sum(rate(flask_http_request_total{job="financial-microservice", status="500"}[5m])) > 5
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "تعداد خطاهای 500 میکروسرویس مالی بسیار زیاد است."
+          description: "بیش از 5 خطای HTTP 500 در 5 دقیقه گذشته در سرویس {{ $labels.instance }} رخ داده است."
