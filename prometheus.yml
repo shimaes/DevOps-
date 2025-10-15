@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s  # هر 15 ثانیه scrape
+
+scrape_configs:
+  - job_name: 'financial-microservice'
+    static_configs:
+      - targets: ['flask-app:5000']  # اصلاح target به نام سرویس درست
+    metrics_path: /metrics  # endpoint expose‌شده در app.py
+
+rule_files:
+  - /etc/prometheus/alert.rules.yml  # لود rules برای alerting
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']  # لینک به سرویس Alertmanager

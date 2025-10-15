@@ -1,0 +1,24 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: 'telegram-receiver'
+
+receivers:
+  - name: 'telegram-receiver'
+    telegram_configs:
+      - bot_token: "{{ telegram_bot_token | string }}"  # placeholder – از CI inject می‌شه
+        chat_id: "{{ telegram_chat_id | string }}"  # placeholder
+        api_url: 'https://api.telegram.org'
+        parse_mode: 'Markdown'
+        message: |  # قالب پیام
+          {% raw %}
+          🚨 **هشدار: {{ .Status | toUpper }}** 🚨
+          {{ range .Alerts }}
+          - **خلاصه:** {{ .Annotations.summary }}
+          - **توضیح:** {{ .Annotations.description }}
+          - **شدت:** {{ .Labels.severity }}
+          - **زمان شروع:** {{ .StartsAt }}
+          {{ end }}
+          لینک به Prometheus: http://your-prometheus-url:9090
+          {% endraw %}
